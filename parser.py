@@ -1,4 +1,4 @@
-""" app/parser.py
+""" parser.py
 """
 from urllib import request
 from time import sleep
@@ -52,7 +52,7 @@ def build_events_list():
             time_until = time_tag.get_text()
 
             # Capture some time data fields and enter into dict
-            time_re = re(r'(?i)(?:in )?(?P<v1>\d{1,2}) (?P<u1>[^\Ws]*)s? (?P<v2>\d{1,2}) (?P<u2>[^\Ws]*)')
+            time_re = re(r'(?i)(?:in )?(?P<v1>\d{1,2}) (?P<u1>s?[^\Ws]*)s? (?P<v2>\d{1,2}) (?P<u2>s?[^\Ws]*)')
             match = time_re.match(time_until)
             if match == None:
                 continue
@@ -65,10 +65,12 @@ def build_events_list():
                 match_dict['u2'] + 's': int(match_dict['v2']) * time_direction
             }
             times_dict = {'years': 0, 'months': 0, 'weeks': 0, 'days': 0,
-                          'hours': 0, 'mins': 0, 'seconds': 0}
+                          'hours': 0, 'mins': 0, 'secs': 0}
             times_dict.update(event_time_dict)
             times_dict['minutes'] = times_dict['mins']
             del times_dict['mins']
+            times_dict['seconds'] = times_dict['secs']
+            del times_dict['secs']
 
             # `timedelta` doesn't take month or year values so do this by hand
             # First, remove from the dict but save the values
@@ -117,4 +119,7 @@ def build_events_list():
                 'past': time_direction < 0,
             })
     # Sort list and return
-    return sorted(bp_events_list, key=lambda item:item['when'])
+    bp_events_list.sort(key=lambda item:item['when'])
+    for bp_event in bp_events_list:
+        del bp_event['when']
+    return bp_events_list

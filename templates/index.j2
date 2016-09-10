@@ -44,6 +44,10 @@
     <div class="column">
         {% set switched = False %}
         {% for event in events_list %}
+            {% if switched == False and event.past == False %}
+                {% set switched = True %}
+                <hr id="present_point">
+            {% endif %}
             <div class="entry">
                 <div class="entry-content">
                     <p>
@@ -53,10 +57,6 @@
                     </p>
                 </div>
             </div>
-            {% if switched == False and event.past == False %}
-                {% set switched = True %}
-                <hr id="present_point">
-            {% endif %}
         {% endfor %}
     </div>
 </body>
