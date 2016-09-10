@@ -6,6 +6,7 @@ from flask import Flask, render_template
 from flask_redis import FlaskRedis
 
 server = Flask(__name__)
+server.config.from_pyfile('config.py')
 redis = FlaskRedis(server)
 
 @server.route('/')
