@@ -3,9 +3,9 @@
 from urllib import request
 from time import sleep
 from datetime import datetime, timedelta
-from pytz import timezone
 from re import compile as re
 
+from pytz import timezone
 from bs4 import BeautifulSoup
 
 def get_bp_html_events_lists():
@@ -79,12 +79,12 @@ def build_events_list():
             # Next generate a timedelta without month or year changes, and add
             #   it to the current time
             time_elapsed_wo_my = timedelta(**times_dict)
-            target_time_wo_my = datetime.now(timezone(US/Eastern)) + time_elapsed_wo_my
+            target_time_wo_my = datetime.now(timezone('US/Eastern')) + time_elapsed_wo_my
             # Find the value of the month and year changes and adjust based on
             #   the limited range (1..12) of months
             target_year = target_time_wo_my.year + years
             target_month = target_time_wo_my.month + months
-            if target_month > 12:
+            if target_month >= 12:
                 target_year += 1
                 target_month -= 12
             if target_month < 1:
@@ -93,6 +93,14 @@ def build_events_list():
             # Update the time
             target_time = target_time_wo_my.replace(year=target_year,
                                                     month=target_month)
+            if 'hour' in time_until or 'min' in time_until:
+                # We have a pretty fine estimate, include hours
+                rounded_minute = int(target_time.minute/15)*15
+                when_string = target_time.replace(minute=rounded_minute).strftime('%A, %B %d, %Y at %I:%M %p')
+            else:
+                # Less fine tuning available
+                when_string = target_time.strftime('%A, %B %d, %Y')
+
 
             # Get event location
             place_tag = bp_html_event.find('span', {'itemprop': 'name address'})
@@ -104,14 +112,9 @@ def build_events_list():
                 'what': link_text,
                 'where': place,
                 'when': target_time,
-                'when_string': target_time,
+                'when_string': when_string,
                 'until': time_until,
                 'past': time_direction < 0,
             })
     # Sort list and return
     return sorted(bp_events_list, key=lambda item:item['when'])
-
-
-# events_list = build_events_list()
-# for event in events_list:
-#     print(event['when'], event['title'])

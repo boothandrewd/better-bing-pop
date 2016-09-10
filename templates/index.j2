@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <!-- JS -->
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous" defer></script>
+    <!-- CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: white;
+            color: MediumSlateBlue;
+        }
+
+        p {
+            margin: 0;
+        }
+
+        .column {
+            min-width: 320px;
+            width: 60%;
+            margin: 0 auto;
+        }
+
+        .entry {
+            width: 100%;
+            margin: 10px;
+            background-color: LightGray;
+        }
+
+        .entry-content {
+            margin: 5px;
+            padding: 10px;
+        }
+    </style>
+    <title>Better BingPop</title>
+</head>
+<body>
+    <div class="column">
+        {% set switched = False %}
+        {% for event in events_list %}
+            <div class="entry">
+                <div class="entry-content">
+                    <p>
+                        <font size="+1"><a href="{{event.url}}">{{event.what}}</a></font> {{event.until}}<br>
+                        {% if event.where != '' %}{{event.where}}<br>{% endif %}
+                        {{event.when_string}}<br>
+                    </p>
+                </div>
+            </div>
+            {% if switched == False and event.past == False %}
+                {% set switched = True %}
+                <hr id="present_point">
+            {% endif %}
+        {% endfor %}
+    </div>
+</body>
+<script type="text/javascript">
+    setTimeout(function(){
+        $('html, body').animate({
+            scrollTop: $("#present_point").offset().top
+        }, 500);
+    }, 100);
+</script>
+</html>
